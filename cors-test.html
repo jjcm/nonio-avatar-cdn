@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <label for="token">Token</label>
+    <input type="text" id="token" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJleHBpcmVzQXQiOjE1OTE0NjA3NDB9.jcnWY_wQWpK_4r62slwvwxfKielvbzpqY2aW87xWs_E"></input>
+
+    <h1>Working Example</h1>
+    <form id="standard-form" enctype="multipart/form-data" action="https://image.non.io/upload" method="post">
+      <input type="file" name="files"/>
+      <input type="submit" value="upload"/>
+    </form>
+
+    <h1>Changing the file example</h1>
+    <input id="manual-file" type="file" name="files"/>
+    <form id="manual-form" enctype="multipart/form-data" action="https://image.non.io/upload" method="post">
+      <input type="submit" value="upload"/>
+    </form>
+
+    <h1>Changing a different field example</h1>
+    <input type="text" id="manual-text" value="example text that we'll add to the post"></input>
+    <form id="manual-form-non-file" enctype="multipart/form-data" action="https://image.non.io/upload" method="post">
+      <input id="manual-file" type="file" name="files"/>
+      <input type="submit" value="upload"/>
+    </form>
+  </body>
+  <script>
+    document.getElementById('standard-form').addEventListener('submit', e => { 
+      const form = e.target
+      const auth = document.getElementById('token').value
+      e.preventDefault()
+
+      let request = new XMLHttpRequest()
+      let data = new FormData(form)
+
+      request.responseType = 'json'
+      request.open('post', 'https://image.non.io' + '/upload') 
+      request.setRequestHeader('Authorization', 'Bearer ' + auth)
+      request.send(data)
+
+    })
+
+    document.getElementById('manual-form').addEventListener('submit', e => { 
+      const form = e.target
+      const auth = document.getElementById('token').value
+      e.preventDefault()
+
+      let request = new XMLHttpRequest()
+      let data = new FormData(form)
+      data.set('files', document.querySelector('#manual-file').files[0])
+
+      request.responseType = 'json'
+      request.open('post', 'https://image.non.io' + '/upload') 
+      request.setRequestHeader('Authorization', 'Bearer ' + auth)
+      request.send(data)
+    })
+
+    document.getElementById('manual-form-non-file').addEventListener('submit', e => { 
+      const form = e.target
+      const auth = document.getElementById('token').value
+      e.preventDefault()
+
+      let request = new XMLHttpRequest()
+      let data = new FormData(form)
+      data.set('asdf', document.querySelector('#manual-text').value)
+
+      request.responseType = 'json'
+      request.open('post', 'https://image.non.io' + '/upload') 
+      request.setRequestHeader('Authorization', 'Bearer ' + auth)
+      request.send(data)
+    })
+  </script>
+</html>
