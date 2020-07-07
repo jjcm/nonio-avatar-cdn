@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
   <body>
-    <form
-      enctype="multipart/form-data"
-      action="https://image.non.io/upload"
-      method="post"
-    >
-      <input type="file" name="files"/>
-      <label>url</label>
-      <input type="text" name="url"/>
-      <input type="submit" value="upload"/>
-    </form>
     <label>bearer token</label>
     <input id="auth" type="text" name="auth"/>
+    <form
+      enctype="multipart/form-data"
+      action="http://localhost:8081/upload"
+      method="post"
+    >
+      <label for="size">Size</label>
+      <input id="size" type="text" name="size"/>
+      <br/>
+      <label for="xoffset">x offset</label>
+      <input id="xoffset" type="text" name="xoffset"/>
+      <br/>
+      <label for="yoffset">y offset</label>
+      <input id="yoffset" type="text" name="yoffset"/>
+      <br/>
+      <input type="file" name="files"/>
+      <br/>
+      <input type="submit" value="upload"/>
+    </form>
   </body>
   <script>
     document.addEventListener('submit', e => { 

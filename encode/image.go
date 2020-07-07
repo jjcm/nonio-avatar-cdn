@@ -7,10 +7,15 @@ import (
 	"mime/multipart"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 )
 
 // Image encodes the image into a webp and returns the path to it
-func Image(file multipart.File, url string) error {
+func Image(file multipart.File, user string) error {
+
+	workingDir, err := os.Getwd()
+
 	// Create a temp file
 	tempFile, err := ioutil.TempFile("files/temp-images", "image-*")
 	if err != nil {
@@ -27,9 +32,27 @@ func Image(file multipart.File, url string) error {
 	}
 	tempFile.Write(fileBytes)
 
+	// get the dimensions of the file that was uploaded and print to stdout
+	infoCmd := exec.Command("identify", "-format", "%w %h", tempFile.Name())
+	infoCmd.Dir = workingDir
+	infoOutput, err := infoCmd.Output()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	// If we got output without errors, then parse the output and log it.
+	dimensionTokens := strings.Split(string(infoOutput), " ")
+	width, err := strconv.Atoi(dimensionTokens[0])
+	height, err := strconv.Atoi(dimensionTokens[1])
+	if err != nil {
+		fmt.Println("Error parsing image dimensions")
+		return err
+	}
+	fmt.Printf("Image width: %v, height: %v\n", width, height)
+
 	// since this is an image we'll use magick to encode it
-	cmd := exec.Command("convert", tempFile.Name(), "(", "+clone", "-resize", "192x144^", "-write", fmt.Sprintf("files/thumbnails/%v.webp", url), "+delete", ")", fmt.Sprintf("files/images/%v.webp", url))
-	workingDir, err := os.Getwd()
+	cmd := exec.Command("convert", tempFile.Name(), "(", "+clone", "-resize", "96x96^", "-write", fmt.Sprintf("files/thumbnails/%v.webp", user), "+delete", ")", "-resize", "512x512>", fmt.Sprintf("files/images/%v.webp", user))
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -38,6 +61,7 @@ func Image(file multipart.File, url string) error {
 	var output bytes.Buffer
 	cmd.Stderr = &output
 	err = cmd.Run()
+	fmt.Println(output.String())
 
 	return err
 }

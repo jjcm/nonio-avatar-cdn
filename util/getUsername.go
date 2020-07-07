@@ -8,13 +8,14 @@ import (
 )
 
 type authorizationResponse struct {
-	Error string
-	Email string
-	ID    int
+	Error    string
+	Email    string
+	Username string
+	ID       int
 }
 
-// GetUserEmail checks token on the server to see if it's valid, and if so returns the user's email
-func GetUserEmail(bearerToken string) (string, error) {
+// GetUsername checks token on the server to see if it's valid, and if so returns the user's username
+func GetUsername(bearerToken string) (string, error) {
 	// Send a req to the api to get the email from our token, if it's valid
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://api.non.io/protected", nil)
@@ -49,5 +50,5 @@ func GetUserEmail(bearerToken string) (string, error) {
 		err = fmt.Errorf(authResponse.Error)
 	}
 
-	return authResponse.Email, err
+	return authResponse.Username, err
 }
