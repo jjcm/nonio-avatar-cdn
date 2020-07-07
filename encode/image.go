@@ -71,7 +71,11 @@ func Image(file multipart.File, user string, xOffset int, yOffset int, size int)
 	}
 
 	// since this is an image we'll use magick to encode it
-	cmd := exec.Command("convert", tempFile.Name(), "(", "+clone", "-resize", "96x96^", "-write", fmt.Sprintf("files/thumbnails/%v.webp", user), "+delete", ")", "-resize", "512x512>", fmt.Sprintf("files/images/%v.webp", user))
+	cmd := exec.Command("convert", tempFile.Name(),
+		"(", "+clone", "-resize", "96x96^", "-write", fmt.Sprintf("files/thumbnails/%v.webp", user), "+delete", ")",
+		"(", "+clone", "-resize", "96x96^", "-write", fmt.Sprintf("files/thumbnails/%v.heic", user), "+delete", ")",
+		"(", "+clone", "-resize", "512x512>", "-write", fmt.Sprintf("files/images/%v.heic", user), "+delete", ")",
+		"-resize", "512x512>", fmt.Sprintf("files/images/%v.webp", user))
 	if err != nil {
 		return err
 	}
