@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"soci-cdn/encode"
 	"soci-cdn/util"
+	"strconv"
 )
 
 // UploadFile takes the form upload and delegates to the encoders
@@ -27,6 +28,14 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the crop parameters.
+	xOffset, parseErr := strconv.Atoi(r.FormValue("xoffset"))
+	yOffset, parseErr := strconv.Atoi(r.FormValue("yoffset"))
+	size, parseErr := strconv.Atoi(r.FormValue("size"))
+	if parseErr != nil {
+		util.SendError(w, fmt.Sprintf("Error parsing crop dimensions. xOffset: %v, yOffset: %v, size: %v", r.FormValue("xoffset"), r.FormValue("yoffset"), r.FormValue("size")), 400)
+	}
+
 	// Parse our file and assign it to the proper handlers depending on the type
 	file, handler, err := r.FormFile("files")
 	if err != nil {
@@ -43,10 +52,13 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	switch re.FindStringSubmatch(mimeType)[1] {
 	case "image":
-		err = encode.Image(file, user)
+		err = encode.Image(file, user, xOffset, yOffset, size)
 	}
+
 	if err != nil {
-		util.SendError(w, "Error encoding the file.", 500)
+		fmt.Println(err)
+		util.SendError(w, "Error encoding or cropping the file", 500)
+		return
 	}
 
 	util.SendResponse(w, user, 200)
