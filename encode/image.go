@@ -23,6 +23,7 @@ func Image(file multipart.File, user string, xOffset int, yOffset int, size int)
 		return err
 	}
 	defer tempFile.Close()
+	defer os.Remove(tempFile.Name())
 
 	// read the uploaded file into a buffer and write it to our temp file
 	fileBytes, err := ioutil.ReadAll(file)
@@ -83,7 +84,6 @@ func Image(file multipart.File, user string, xOffset int, yOffset int, size int)
 	var output bytes.Buffer
 	cmd.Stderr = &output
 	err = cmd.Run()
-	fmt.Println(output.String())
 
 	return err
 }
