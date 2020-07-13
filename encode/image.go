@@ -2,7 +2,6 @@ package encode
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -51,11 +50,11 @@ func Image(file multipart.File, user string, xOffset int, yOffset int, size int)
 
 	// Check if our crop fits within the image size
 	if size+xOffset > width {
-		return errors.New("Crop width exceeds the image dimensions")
+		size = width - xOffset
 	}
 
 	if size+yOffset > height {
-		return errors.New("Crop height exceeds the image dimensions")
+		size = width - yOffset
 	}
 
 	// If the checks are good, let's crop our temp image.

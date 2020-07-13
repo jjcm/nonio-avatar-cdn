@@ -8,7 +8,7 @@ import (
 
 func setupRoutes() {
 	http.HandleFunc("/upload", route.UploadFile)
-	http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":8082", nil)
 }
 
 func main() {
