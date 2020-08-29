@@ -1,3 +1,3 @@
-module soci-cdn
+module soci-avatar-cdn
 
 go 1.14

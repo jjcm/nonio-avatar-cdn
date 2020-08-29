@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"soci-cdn/route"
+	"soci-avatar-cdn/route"
 )
 
 func setupRoutes() {
