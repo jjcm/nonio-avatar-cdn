@@ -15,10 +15,11 @@ func setupRoutes() {
 		port = "4202"
 	}
 
+	fmt.Printf("Listening on %v\n", port)
 	http.ListenAndServe(":"+port, nil)
 }
 
 func main() {
-	fmt.Println("Starting media encoding server")
+	fmt.Println("Starting avatar encoding server...")
 	setupRoutes()
 }
