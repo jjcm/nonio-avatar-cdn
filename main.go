@@ -3,12 +3,19 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"soci-cdn/route"
+	"os"
+	"soci-avatar-cdn/route"
 )
 
 func setupRoutes() {
 	http.HandleFunc("/upload", route.UploadFile)
-	http.ListenAndServe(":8082", nil)
+
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "4202"
+	}
+
+	http.ListenAndServe(":"+port, nil)
 }
 
 func main() {

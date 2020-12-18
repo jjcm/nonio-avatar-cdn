@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"soci-cdn/encode"
-	"soci-cdn/util"
+	"soci-avatar-cdn/encode"
+	"soci-avatar-cdn/util"
 	"strconv"
 )
 
