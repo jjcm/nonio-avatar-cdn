@@ -15,6 +15,10 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		util.SendResponse(w, "", 200)
 		return
 	}
+	if r.Method == "GET" {
+		util.SendError(w, "You can only post to this route", 500)
+		return
+	}
 	// Parse our multipart form, set a 1GB max upload size
 	r.ParseMultipartForm(1 << 30)
 
