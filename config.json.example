@@ -1,4 +1,4 @@
 {
-  "PORT": "4202",
-  "API_HOST": "http://localhost:4201"
+  "port": "4202",
+  "api_host": "http://localhost:4201"
 }
