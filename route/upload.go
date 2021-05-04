@@ -61,7 +61,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println(err)
-		util.SendError(w, "Error encoding or cropping the file", 500)
+		util.SendError(w, fmt.Sprintf("Error encoding or cropping the file: %v", err), 500)
 		return
 	}
 
