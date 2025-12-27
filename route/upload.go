@@ -33,11 +33,18 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the crop parameters.
-	xOffset, parseErr := strconv.Atoi(r.FormValue("xoffset"))
-	yOffset, parseErr := strconv.Atoi(r.FormValue("yoffset"))
-	size, parseErr := strconv.Atoi(r.FormValue("size"))
-	if parseErr != nil {
-		util.SendError(w, fmt.Sprintf("Error parsing crop dimensions. xOffset: %v, yOffset: %v, size: %v", r.FormValue("xoffset"), r.FormValue("yoffset"), r.FormValue("size")), 400)
+	xOffset, _ := strconv.Atoi(r.FormValue("xoffset"))
+	yOffset, _ := strconv.Atoi(r.FormValue("yoffset"))
+	uploadType := r.FormValue("type")
+
+	community := r.FormValue("community")
+	if community != "" {
+		isAdmin, err := util.VerifyCommunityAdmin(community, bearerToken)
+		if err != nil || !isAdmin {
+			util.SendError(w, "User is not an admin of this community", 403)
+			return
+		}
+		user = "community_" + community
 	}
 
 	// Parse our file and assign it to the proper handlers depending on the type
@@ -56,7 +63,14 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	switch re.FindStringSubmatch(mimeType)[1] {
 	case "image":
-		err = encode.Image(file, user, xOffset, yOffset, size)
+		if uploadType == "banner" {
+			cropWidth, _ := strconv.Atoi(r.FormValue("width"))
+			cropHeight, _ := strconv.Atoi(r.FormValue("height"))
+			err = encode.Banner(file, user, xOffset, yOffset, cropWidth, cropHeight)
+		} else {
+			size, _ := strconv.Atoi(r.FormValue("size"))
+			err = encode.Image(file, user, xOffset, yOffset, size)
+		}
 	}
 
 	if err != nil {
