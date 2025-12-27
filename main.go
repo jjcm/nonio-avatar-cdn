@@ -9,9 +9,9 @@ import (
 )
 
 func setupRoutes(settings *config.Config) {
-	http.Handle("/", http.FileServer(http.Dir("./files/images")))
 	http.Handle("/thumbnail/", http.StripPrefix("/thumbnail/", http.FileServer(http.Dir("./files/thumbnails"))))
 	http.HandleFunc("/upload", route.UploadFile)
+	http.Handle("/", http.FileServer(http.Dir("./files/images")))
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
