@@ -7,7 +7,22 @@ import (
 	"soci-avatar-cdn/encode"
 	"soci-avatar-cdn/util"
 	"strconv"
+	"strings"
 )
+
+func sanitizeEmojiName(name string) string {
+	name = strings.TrimSpace(strings.ToLower(name))
+	re := regexp.MustCompile(`[^a-z0-9_]+`)
+	name = re.ReplaceAllString(name, "_")
+	name = strings.Trim(name, "_")
+	if len(name) < 2 {
+		return ""
+	}
+	if len(name) > 32 {
+		name = name[:32]
+	}
+	return name
+}
 
 // UploadFile takes the form upload and delegates to the encoders
 func UploadFile(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +52,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 	yOffset, _ := strconv.Atoi(r.FormValue("yoffset"))
 	uploadType := r.FormValue("type")
 
-	community := r.FormValue("community")
+	community := strings.TrimSpace(r.FormValue("community"))
 	if community != "" {
 		isAdmin, err := util.VerifyCommunityAdmin(community, bearerToken)
 		if err != nil || !isAdmin {
@@ -63,7 +78,26 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	switch re.FindStringSubmatch(mimeType)[1] {
 	case "image":
-		if uploadType == "banner" {
+		if uploadType == "emoji" {
+			name := sanitizeEmojiName(r.FormValue("name"))
+			if name == "" {
+				util.SendError(w, "invalid emoji name", 400)
+				return
+			}
+			// Deterministic path: files/images/emoji/<name>.webp
+			// The encode.Emoji function expects just the key part inside files/images/
+			key := "emoji/" + name
+			animated, encErr := encode.Emoji(file, key)
+			if encErr != nil {
+				err = encErr
+			} else if animated {
+				key += ".animated"
+			}
+			if err == nil {
+				util.SendResponse(w, key, 200)
+				return
+			}
+		} else if uploadType == "banner" {
 			cropWidth, _ := strconv.Atoi(r.FormValue("width"))
 			cropHeight, _ := strconv.Atoi(r.FormValue("height"))
 			err = encode.Banner(file, user, xOffset, yOffset, cropWidth, cropHeight)
